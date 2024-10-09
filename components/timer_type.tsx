@@ -3,7 +3,7 @@ import React, { Dispatch, SetStateAction } from 'react';
 
 const TimerType = ({ type, setType }: { type: ITimerType, setType: Dispatch<SetStateAction<ITimerType>> }) => {
   return (
-    <View className={`border border-grey rounded-lg h-8 absolute right-6 top-3 flex items-center flex-row overflow-hidden`}>
+    <View className={`border border-grey rounded-lg h-8 absolute right-6 top-3 z-50 flex items-center flex-row overflow-hidden`}>
       <TouchableWithoutFeedback onPress={() => { setType("Standard") }}>
         <View className={`${type==="Standard" && "bg-green-a50"} h-full flex items-center justify-center`}>
           <Text className={`text-white ${type === "Standard" ? "opacity-100" : "opacity-30"} font-sfui-semibold px-3`}>
