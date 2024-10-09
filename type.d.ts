@@ -1,0 +1,1 @@
+type ITimerType = "Standard" | "Custom"
