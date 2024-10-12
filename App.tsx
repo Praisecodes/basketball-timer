@@ -29,6 +29,21 @@ export default function App() {
   });
 
   useEffect(() => {
+    let shotClockInterval: NodeJS.Timeout;
+    let timerInterval: NodeJS.Timeout;
+    if (countDownActive || (timerType === "Standard" && (countDownActive && gameInProgress))) {
+      timerInterval = setInterval(() => {
+        setTimer(time => time - 1);
+      }, 1000);
+      shotClockInterval = setInterval(() => {
+        setShotClockTime(time => time - 0.1);
+      }, 98);
+    }
+
+    return () => {
+      clearInterval(shotClockInterval);
+      clearInterval(timerInterval);
+    }
   }, [gameInProgress, countDownActive]);
 
   useEffect(() => {
@@ -37,7 +52,16 @@ export default function App() {
     } else {
       setTimer(720);
     }
-  }, [timerType])
+    setCountDownActive(false);
+    setGameInProgress(false);
+  }, [timerType]);
+
+  useEffect(() => {
+    if (shotClockTime <= 0) {
+      setCountDownActive(false);
+      setShotClockTime(24);
+    }
+  }, [shotClockTime]);
 
   // Check if fonts were loaded correctly!
   if (!fontsLoaded) return null;
@@ -62,8 +86,8 @@ export default function App() {
       <View className={`flex flex-row items-center ios:mt-4 ios:px-5 android:px-14 justify-between`}>
         <ScoreCounter title='Home' />
 
-        {!gameInProgress && (
-          <TouchableWithoutFeedback>
+        {(!countDownActive && !gameInProgress) && (
+          <TouchableWithoutFeedback onPress={() => { setCountDownActive(true); setGameInProgress(true) }}>
             <View className={`rounded-full w-[70px] h-[70px] bg-green flex items-center justify-center`}>
               <Text className={`text-white font-sfui-semibold text-xl`}>
                 Start
@@ -72,23 +96,35 @@ export default function App() {
           </TouchableWithoutFeedback>
         )}
 
-        {gameInProgress && (
+        {(countDownActive || gameInProgress) && (
           <View className={`flex flex-row items-center`}>
-            <TouchableWithoutFeedback>
+            <TouchableWithoutFeedback
+              onPress={() => {
+                if (timerType === "Standard") {
+                  setTimer(720);
+                } else {
+                  setTimer(600);
+                }
+                setShotClockTime(24);
+                setCurrentPeriod(0);
+                setGameInProgress(false);
+                setCountDownActive(false);
+              }}
+            >
               <Image
                 source={Reset}
-                className={`w-[57px] h-[43.51px] mr-6`}
+                className={`w-[53px] h-[39.51px] mr-6`}
               />
             </TouchableWithoutFeedback>
 
-            <TouchableWithoutFeedback>
+            <TouchableWithoutFeedback onPress={() => { setCountDownActive(!countDownActive); }}>
               <Image
                 source={countDownActive ? Pause : Play}
                 className={`w-[24px] h-[29px] mr-5`}
               />
             </TouchableWithoutFeedback>
 
-            <TouchableWithoutFeedback>
+            <TouchableWithoutFeedback onPress={() => { setShotClockTime(time => time + 14) }}>
               <Text className={`text-green font-sfui-semibold text-[27px] leading-[32px]`}>
                 +14
               </Text>
