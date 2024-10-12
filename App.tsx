@@ -30,11 +30,6 @@ export default function App() {
     "SFUI-Semibold": require('./assets/fonts/SFUIText-Semibold.otf')
   });
 
-  const playBuzzerSound = async () => {
-    const { sound } = await Audio.Sound.createAsync(require('./assets/sounds/buzzer.wav'));
-    await sound.playAsync();
-  }
-
   useEffect(() => {
     // Register Sounds
     (async () => {
