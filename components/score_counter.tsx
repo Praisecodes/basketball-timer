@@ -1,8 +1,8 @@
 import { View, Text, TouchableWithoutFeedback, Image } from 'react-native';
-import React, { useState } from 'react';
+import React, { Dispatch, SetStateAction, useState } from 'react';
 import Undo from '../assets/icons/undo.png';
 
-const ScoreCounter = ({ title }: { title: string; }) => {
+const ScoreCounter = ({ title, setShotClockTime }: { title: string; setShotClockTime: Dispatch<SetStateAction<number>> }) => {
   const [score, setScore] = useState<number>(0);
   const [lastPointUpdate, setLastPointUpdate] = useState<number>(0);
   const [undoIsActive, setUndoIsActive] = useState<boolean>(false);
@@ -40,6 +40,7 @@ const ScoreCounter = ({ title }: { title: string; }) => {
           setScore(score => score + 1);
           setLastPointUpdate(1);
           setUndoIsActive(true);
+          setShotClockTime(24);
         }}>
           <Text className={`text-green text-xl p-1 font-sfui-semibold`}>
             +1
@@ -50,6 +51,7 @@ const ScoreCounter = ({ title }: { title: string; }) => {
           setScore(score => score + 2);
           setLastPointUpdate(2);
           setUndoIsActive(true);
+          setShotClockTime(24);
         }}>
           <Text className={`text-green mt-1 p-1 text-xl font-sfui-semibold`}>
             +2
@@ -60,6 +62,7 @@ const ScoreCounter = ({ title }: { title: string; }) => {
           setScore(score => score + 3);
           setLastPointUpdate(3);
           setUndoIsActive(true);
+          setShotClockTime(24);
         }}>
           <Text className={`text-green mt-1 p-1 text-xl font-sfui-semibold`}>
             +3

@@ -9,6 +9,7 @@ import PeriodTracker from './components/period_tracker';
 import Pause from './assets/icons/pause.png';
 import Reset from './assets/icons/reset.png';
 import Play from './assets/icons/play.png';
+import { Audio } from 'expo-av';
 
 export default function App() {
   // Set app variables
@@ -18,6 +19,7 @@ export default function App() {
   const [currentPeriod, setCurrentPeriod] = useState<number>(0); // Track the current period being played (in standard mode).
   const [countDownActive, setCountDownActive] = useState<boolean>(false); // Track if any of the two timers are running.
   const [gameInProgress, setGameInProgress] = useState<boolean>(false); // Track if a game is being played. This could be if any of the timers are going or are paused.
+  const [buzzerSound, setBuzzerSound] = useState<Audio.Sound | undefined>(undefined);
 
   // Load app fonts
   const [fontsLoaded] = useFonts({
@@ -27,6 +29,19 @@ export default function App() {
     "SFUI-Medium": require('./assets/fonts/SFUIText-Medium.otf'),
     "SFUI-Semibold": require('./assets/fonts/SFUIText-Semibold.otf')
   });
+
+  const playBuzzerSound = async () => {
+    const { sound } = await Audio.Sound.createAsync(require('./assets/sounds/buzzer.wav'));
+    await sound.playAsync();
+  }
+
+  useEffect(() => {
+    // Register Sounds
+    (async () => {
+      const { sound } = await Audio.Sound.createAsync(require('./assets/sounds/buzzer.wav'));
+      setBuzzerSound(sound);
+    })()
+  }, []);
 
   useEffect(() => {
     let shotClockInterval: NodeJS.Timeout;
@@ -58,6 +73,7 @@ export default function App() {
 
   useEffect(() => {
     if (shotClockTime <= 0) {
+      buzzerSound?.playAsync();
       setCountDownActive(false);
       setShotClockTime(24);
     }
@@ -84,7 +100,7 @@ export default function App() {
       </View>
 
       <View className={`flex flex-row items-center ios:mt-4 ios:px-5 android:px-14 justify-between`}>
-        <ScoreCounter title='Home' />
+        <ScoreCounter title='Home' setShotClockTime={setShotClockTime} />
 
         {(!countDownActive && !gameInProgress) && (
           <TouchableWithoutFeedback onPress={() => { setCountDownActive(true); setGameInProgress(true) }}>
@@ -132,7 +148,7 @@ export default function App() {
           </View>
         )}
 
-        <ScoreCounter title='Away' />
+        <ScoreCounter title='Away' setShotClockTime={setShotClockTime} />
       </View>
     </SafeAreaView>
   );
