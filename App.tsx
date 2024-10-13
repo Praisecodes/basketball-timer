@@ -15,12 +15,14 @@ import GameType from './components/game_type';
 export default function App() {
   // Set app variables
   const [timer, setTimer] = useState<number>(720);
+  const [selectedTime, setSelectedTime] = useState<number>(720); // Time agreed upon to play game.
   const [timerType, setTimerType] = useState<ITimerType>("Standard");
   const [shotClockTime, setShotClockTime] = useState<number>(24);
   const [currentPeriod, setCurrentPeriod] = useState<number>(0); // Track the current period being played (in standard mode).
   const [countDownActive, setCountDownActive] = useState<boolean>(false); // Track if any of the two timers are running.
   const [gameInProgress, setGameInProgress] = useState<boolean>(false); // Track if a game is being played. This could be if any of the timers are going or are paused.
   const [buzzerSound, setBuzzerSound] = useState<Audio.Sound | undefined>(undefined);
+  const [whistleSound, setWhistleSound] = useState<Audio.Sound | undefined>(undefined);
   const [gameType, setGameType] = useState<IGameType>("5x5"); // Full-court or Half-court
 
   // Load app fonts
@@ -36,7 +38,7 @@ export default function App() {
     if (timerType === "Standard") {
       setTimer(720);
     } else {
-      setTimer(600);
+      setTimer(selectedTime);
     }
     setShotClockTime(gameType === "5x5" ? 24 : 12);
     setCurrentPeriod(0);
@@ -46,19 +48,21 @@ export default function App() {
 
   const handleTimerEllapse = async () => {
     if (timer <= 0) {
-      await buzzerSound?.playAsync();
+      await buzzerSound?.replayAsync();
       setCountDownActive(false);
-      if (timerType === "Standard") {
-        setTimer(720);
+      setTimer(timerType === "Standard" ? 720 : selectedTime);
+      if (timerType === "Standard" && currentPeriod < 3) {
+        setCurrentPeriod(period => period + 1);
+      } else if (timerType === "Custom") {
+        resetGame();
       }
-      if (timerType === "Standard" && currentPeriod < 3) setCurrentPeriod(period => period + 1);
       setShotClockTime(gameType === "5x5" ? 24 : 12);
     }
   }
 
   const handleShotClockEllapse = async () => {
     if (shotClockTime <= 0) {
-      await buzzerSound?.playAsync();
+      await whistleSound?.replayAsync();
       setCountDownActive(false);
       setShotClockTime(gameType === "5x5" ? 24 : 12);
     }
@@ -68,6 +72,8 @@ export default function App() {
     // Register Sounds
     (async () => {
       const { sound } = await Audio.Sound.createAsync(require('./assets/sounds/buzzer.wav'));
+      const { sound: WHISTLE_SOUND } = await Audio.Sound.createAsync(require('./assets/sounds/whistle.wav'));
+      setWhistleSound(WHISTLE_SOUND);
       setBuzzerSound(sound);
     })()
   }, []);
@@ -94,19 +100,28 @@ export default function App() {
     if (timerType === "Custom") {
       if (gameType === "5x5") {
         setTimer(600);
+        setSelectedTime(600);
         setShotClockTime(24);
       } else {
         setTimer(300);
+        setSelectedTime(300);
         setShotClockTime(12);
       }
     } else {
       setTimer(720);
+      setSelectedTime(720);
       setShotClockTime(24);
       setGameType("5x5");
     }
     setCountDownActive(false);
     setGameInProgress(false);
   }, [timerType, gameType]);
+
+  useEffect(() => {
+    if (currentPeriod === 3) {
+      resetGame();
+    }
+  }, [currentPeriod]);
 
   useEffect(() => {
     handleShotClockEllapse();
@@ -130,7 +145,7 @@ export default function App() {
 
       <View className={`flex flex-col items-center justify-center w-full ios:pt-8 android:pt-5 pb-3`}>
         <View className={`flex flex-row items-center`}>
-          <TouchableWithoutFeedback onPress={() => { !gameInProgress && setTimer(time => time - 60) }}>
+          <TouchableWithoutFeedback onPress={() => { !gameInProgress && setTimer(time => time - 60); setSelectedTime(time => time - 60); }}>
             <Text className={`font-sfui-bold text-[90px] text-red mr-6`}>
               -
             </Text>
@@ -140,7 +155,7 @@ export default function App() {
             {formatTime(timer)}
           </Text>
 
-          <TouchableWithoutFeedback onPress={() => { !countDownActive && setTimer(time => time + 60) }}>
+          <TouchableWithoutFeedback onPress={() => { !countDownActive && setTimer(time => time + 60); setSelectedTime(time => time + 60); }}>
             <Text className={`font-sfui-bold text-[70px] text-green -mt-1 ml-5`}>
               +
             </Text>
