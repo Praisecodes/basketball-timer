@@ -18,6 +18,8 @@ export default function App() {
   const [selectedTime, setSelectedTime] = useState<number>(720); // Time agreed upon to play game.
   const [timerType, setTimerType] = useState<ITimerType>("Standard");
   const [shotClockTime, setShotClockTime] = useState<number>(24);
+  const [homeScore, setHomeScore] = useState<number>(0);
+  const [awayScore, setAwayScore] = useState<number>(0);
   const [currentPeriod, setCurrentPeriod] = useState<number>(0); // Track the current period being played (in standard mode).
   const [countDownActive, setCountDownActive] = useState<boolean>(false); // Track if any of the two timers are running.
   const [gameInProgress, setGameInProgress] = useState<boolean>(false); // Track if a game is being played. This could be if any of the timers are going or are paused.
@@ -44,6 +46,8 @@ export default function App() {
     setCurrentPeriod(0);
     setGameInProgress(false);
     setCountDownActive(false);
+    setHomeScore(0);
+    setAwayScore(0);
   }
 
   const handleTimerEllapse = async () => {
@@ -170,7 +174,13 @@ export default function App() {
       </View>
 
       <View className={`flex flex-row items-center ios:mt-4 ios:px-5 android:px-14 justify-between`}>
-        <ScoreCounter title='Home' gameType={gameType} setShotClockTime={setShotClockTime} />
+        <ScoreCounter
+          title='Home'
+          gameType={gameType}
+          score={homeScore}
+          setScore={setHomeScore}
+          setShotClockTime={setShotClockTime}
+        />
 
         {(!countDownActive && !gameInProgress) && (
           <TouchableWithoutFeedback onPress={() => { setCountDownActive(true); setGameInProgress(true) }}>
@@ -206,7 +216,13 @@ export default function App() {
           </View>
         )}
 
-        <ScoreCounter title='Away' gameType={gameType} setShotClockTime={setShotClockTime} />
+        <ScoreCounter
+          title='Away'
+          gameType={gameType}
+          score={awayScore}
+          setScore={setAwayScore}
+          setShotClockTime={setShotClockTime}
+        />
       </View>
     </SafeAreaView>
   );

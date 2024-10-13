@@ -2,8 +2,7 @@ import { View, Text, TouchableWithoutFeedback, Image } from 'react-native';
 import React, { Dispatch, SetStateAction, useState } from 'react';
 import Undo from '../assets/icons/undo.png';
 
-const ScoreCounter = ({ title, setShotClockTime, gameType }: { title: string; setShotClockTime: Dispatch<SetStateAction<number>>; gameType: IGameType; }) => {
-  const [score, setScore] = useState<number>(0);
+const ScoreCounter = ({ title, setShotClockTime, gameType, score, setScore }: { title: string; setShotClockTime: Dispatch<SetStateAction<number>>; gameType: IGameType; score: number; setScore: Dispatch<SetStateAction<number>>; }) => {
   const [lastPointUpdate, setLastPointUpdate] = useState<number>(0);
   const [undoIsActive, setUndoIsActive] = useState<boolean>(false);
 
