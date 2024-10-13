@@ -7,4 +7,4 @@
 - [x] Handle buzzer for timer elapsing
 - [x] Handle UI and functionality for resetting a whole game
 - [x] Handle functionality for resetting shot-clock
-- [ ] Handle vibrations on buzzer sound
+- [x] Handle vibrations on buzzer sound

@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { View, Text, SafeAreaView, TouchableWithoutFeedback, Image } from 'react-native';
+import { View, Text, SafeAreaView, TouchableWithoutFeedback, Image, Vibration, Platform } from 'react-native';
 import { formatTime } from './helpers/utils';
 import { useFonts } from 'expo-font';
 import ScoreCounter from './components/score_counter';
@@ -53,6 +53,10 @@ export default function App() {
   const handleTimerEllapse = async () => {
     if (timer <= 0) {
       await buzzerSound?.replayAsync();
+      Vibration.vibrate(
+        2000,
+        false
+      );
       setCountDownActive(false);
       setTimer(timerType === "Standard" ? 720 : selectedTime);
       if (timerType === "Standard" && currentPeriod < 3) {
@@ -67,6 +71,7 @@ export default function App() {
   const handleShotClockEllapse = async () => {
     if (shotClockTime <= 0) {
       await whistleSound?.replayAsync();
+      Vibration.vibrate(300, false);
       setCountDownActive(false);
       setShotClockTime(gameType === "5x5" ? 24 : 12);
     }
@@ -145,7 +150,7 @@ export default function App() {
       {timerType === "Custom" && (<GameType type={gameType} setType={setGameType} disabled={gameInProgress} />)}
 
       {timerType === "Standard" && (<PeriodTracker current_period={currentPeriod} />)}
-      <TimerType type={timerType} setType={setTimerType} />
+      <TimerType disabled={gameInProgress} type={timerType} setType={setTimerType} />
 
       <View className={`flex flex-col items-center justify-center w-full ios:pt-8 android:pt-5 pb-3`}>
         <View className={`flex flex-row items-center`}>
